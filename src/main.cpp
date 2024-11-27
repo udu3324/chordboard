@@ -1,5 +1,14 @@
 #include <Arduino.h>
 
+#include <Mozzi.h>
+#include <Oscil.h>
+#include <Smooth.h>
+#include <tables/sin2048_int8.h>
+#include "MozziConfigValues.h"
+
+#define MOZZI_CONTROL_RATE 128
+#define MOZZI_AUDIO_MODE MOZZI_OUTPUT_PWM
+
 const int effectButton = 43;
 const int effectLED[] = {0, 17, 18, 21};
 
@@ -7,6 +16,8 @@ const int engineButton = 46;
 const int engineLED[] = {38, 39, 40, 41};
 
 const int chordButton[] = {9, 11, 13, 15, 10, 12, 14, 16};
+
+const int touchSlider[] = {1, 2, 3, 4, 5, 6, 7, 8};
 
 void setup() {
   Serial.begin(115200);
@@ -31,7 +42,7 @@ void setup() {
   pinMode(chordButton[7], INPUT_PULLUP);
 }
 
-void loop() {
+void updateControl() {
   for (int i = 0; i < 4; i++) {
     if (digitalRead(chordButton[i]) == HIGH) {
       Serial.println("pressing" + i);
@@ -49,4 +60,10 @@ void loop() {
       analogWrite(engineLED[i], 1);
     }
   }
+
+  //delay(50);
+}
+
+void loop() {
+  audioHook();
 }
