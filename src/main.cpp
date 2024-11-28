@@ -1,13 +1,20 @@
+#define MOZZI_CONTROL_RATE 128
+
+//https://sensorium.github.io/Mozzi/doc/html/hardware_esp32.html
+#define MOZZI_AUDIO_MODE MOZZI_OUTPUT_PDM_VIA_I2S
+#define MOZZI_I2S_PIN_DATA 42
+#define PDM_RESOLUTION 4
+
 #include <Arduino.h>
 
 #include <Mozzi.h>
+#include <MozziGuts.h>
 #include <Oscil.h>
 #include <Smooth.h>
 #include <tables/sin2048_int8.h>
 #include "MozziConfigValues.h"
 
-#define MOZZI_CONTROL_RATE 128
-#define MOZZI_AUDIO_MODE MOZZI_OUTPUT_PWM
+Oscil <2048, MOZZI_AUDIO_RATE> aSin(SIN2048_DATA);
 
 const int effectButton = 43;
 const int effectLED[] = {0, 17, 18, 21};
@@ -40,6 +47,10 @@ void setup() {
   pinMode(chordButton[5], INPUT_PULLUP);
   pinMode(chordButton[6], INPUT_PULLUP);
   pinMode(chordButton[7], INPUT_PULLUP);
+
+  aSin.setFreq(440.0f);
+  
+  startMozzi(MOZZI_CONTROL_RATE);
 }
 
 void updateControl() {
@@ -62,6 +73,10 @@ void updateControl() {
   }
 
   //delay(50);
+}
+
+AudioOutput updateAudio() {
+	return MonoOutput::from8Bit(aSin.next());
 }
 
 void loop() {
